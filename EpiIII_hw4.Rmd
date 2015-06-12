@@ -176,8 +176,20 @@ Calis JC, Phiri KS, Faragher EB, Brabin BJ, Bates I, Cuevas LE, de Haan RJ, Phir
 <h4>8.</h4>
 Using data from Table-2, calculate the overall crude OR for the association between vitamin A deficiency and severe anemia for all study sites combined. Compare this with the adjusted estimate in Figure-1. Is there evidence for confounding of this association based on the 10% change in parameter estimate criteria? If so, in what direction?
 
+(228x90)/(172x19)=6.2791 vs.2.8 (1.3–5.8)
+
+(6.2791-2.8)/6.2791 = 0.5540 > 10%
+
+Yes, there is evidence for confounding. The confounding is biasing the estimate away from the null. 
+
 <h4>9.</h4>
 In figure 1, for exposure ‘vitamin A deficiency’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
+
+Urban: (115x37)/(68x6)=10.4289
+Rural: (113x53)/(104x13)=4.4297
+
+10.4289/4.4297= 2.3543>1 
+There is evidence of multiplicative interaction. 
 
 For vitamin A, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
 
