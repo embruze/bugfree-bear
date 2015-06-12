@@ -1,0 +1,210 @@
+---
+title: "EpiIII-Homework-4"
+author: "Emilie Bruzelius (eb2674)"
+date: "June 9, 2015"
+output: html_document
+---
+<h3>P8400 APPLIED DATA ANALYSIS IN EPIDEMIOLOGY </h3>
+<h3>HOMEWORK 4</h3>
+
+  
+INSTRUCTIONS:
+1. Please keep your answers brief (1-2 sentences).
+2. Please provide relevant SAS codes for your answers.
+
+
+<h4>Part A</h4>
+
+Dataset to be used: LiverCa.sas7bdat
+
+For part A, the objective is to analyze which variable forms (continuous, dichotomous, or categorical) of age and alcohol use best describe the measures’ relationships with liver cancer in the following case-control study:  
+
+Data dictionary for LiverCa dataset
+Variable Name 	Description
+CaseCont
+ 	1=Case (liver cancer)
+	0=Control
+Age	Age in years (range = 21-91 years)
+EtOH
+ 	Daily alcohol consumption:
+	0=0-9 grams/day
+1=10-19 grams/day
+2=20-29 grams/day
+3=30-39 grams/day
+4=40+ grams/day
+
+1. Set up a logistic regression model to examine the effects of the following indicator (dummy) variables of age using ‘21-30’ as the reference group.  Report the parameter estimates.  
+
+```{r}
+rm(list=ls())
+library(sas7bdat)
+hw4 <- read.sas7bdat("LiverCa.sas7bdat", debug=FALSE)
+head (hw4$age)
+hw4$age <- as.integer(hw4$age)
+sapply(hw4, is.numeric)
+```
+
+Indicator variable coding
+```{r error=FALSE, message=FALSE, warning=FALSE}
+hw4$age.c[hw4$age <= 30] <- "age0"
+hw4$age.c[hw4$age >= 31 & hw4$age <= 40] <- "age1"
+hw4$age.c[hw4$age >= 41 & hw4$age <= 50] <- "age2"
+hw4$age.c[hw4$age >= 51 & hw4$age <= 60] <- "age3"
+hw4$age.c[hw4$age >= 61 & hw4$age <= 70] <- "age4"
+hw4$age.c[hw4$age >= 71] <- "age5"
+hw4$age.f = factor(hw4$age.c, labels=c("age0", "age1", "age2", "age3", "age4", "age5"))
+contr.treatment(6)
+contrasts(hw4$age.f) = contr.treatment(6)
+glm.1 = glm(cbind(casecont) ~ age.f,  
+              family=binomial(logit), hw4)
+summary(glm.1)
+```
+
+Parameter estimates:
+       
+31-40: 0.1157     
+41-50: 0.1790
+51-60: 2.3481
+61-70: 2.4391 
+70 or older: 2.7112 
+
+<h4>2a.</h4>
+Plot a graph showing the relationship between the log odds of disease and the six categories of age.  Show your graph.
+
+(I'm not sure that this is exactly what your asking for but here goes...)
+```{r error=FALSE, message=FALSE, warning=FALSE}
+
+plot(casecont ~ age.f, hw4)
+lines(hw4$age.f, glm.1$fitted, type="l", col="red")
+title(main="Liver Cancer and Age Data with Fitted Logistic Regression Line")
+```
+
+<h4>2b.</h4>
+Based on the above analyses, which variable type for age (continuous, dichotomous or categorical) will you choose?  Why?
+
+In this case I assume you should choose a dichotomous because there seems like there is some sort of age threshold. 
+
+
+Regardless of what you decided about the variable type for age, let’s examine the effect of the continuous measurement of age (i.e., ‘age’) on liver cancer using logistic regression.
+
+<h4>3.</h4>
+Report the parameter estimate (b), OR and 95% CI for the crude association between ‘age’ and liver cancer. Interpret the results.
+
+```{r}
+exp(cbind(OR = coef(glm.1), confint(glm.1)))
+```
+
+beta: 0.04918033 95% CI:0.01200935 - 0.1325661
+
+For each 1 unit increase in age, there is 0.049 times increased odds of developing liver cancer. 
+
+
+<h4>4.</h4>
+Estimate the odds of getting liver cancer for a man aged 65 years with a man who is similar in other respects but aged 45 years.
+
+```{r}
+summary(glm.1)
+l <- cbind(0, 0, 1, 0, -1, 0)
+wald.test(b = coef(glm.1), Sigma = vcov(glm.1), L = l)
+```
+OR: 11.46 95% CI: 4.08-47.93. Being age 65, versus 45, significantly changes the log odds of developing liver caner by 2.4391.
+
+<h4>4b.</h4>
+For the above question, what is the assumption if we choose to keep age as a continuous variable?
+
+Keeping age as continuous variable assumes that the relationship is linear on the log-odds scale. 
+
+<h4>5.</h4>
+We will now examine the association between alcohol consumption and liver cancer.  
+
+Create indicator variables for the five categories of alcohol use. Use logistic regression to model the effects of indicator variables of alcohol using non-users as the reference group. Report the parameter estimates.       
+
+```{r error=FALSE, message=FALSE, warning=FALSE}
+hw4$etoh.1[hw4$etoh < 1] <- 0
+hw4$etoh.1[hw4$etoh >=1] <- 1
+
+contr.treatment(2)
+contrasts(hw4$etoh.1) = contr.treatment(2)
+glm.2 = glm(cbind(casecont) ~ etoh.1,  
+              family=binomial(logit), hw4)
+summary(glm.2)
+```
+
+Intercept: -1.8228  
+Any etoh use: 0.7242
+
+(Maybe I'm reading the SAS code wrong but it looks like its setting any etoh use? I'll also try this...)
+
+```{r error=FALSE, message=FALSE, warning=FALSE}
+hw4$etoh <- factor(hw4$etoh)
+glm.3 <- glm(casecont ~ etoh, hw4, family = "binomial")
+summary(glm.3)
+```
+               
+etoh0(Intercept): -1.8228   
+etoh1:            0.4479    
+etoh2:            0.6246    
+etoh3:            1.0433    
+etoh4:            1.4173    
+
+
+<h4>6.</h4>
+Plot a graph showing the relationship between the log odds of disease (betas) and the five categories of alcohol use. Show your graph.
+
+```{r error=FALSE, message=FALSE, warning=FALSE}
+plot(casecont ~ etoh, hw4)
+lines(hw4$etoh, glm.3$fitted, type="l", col="red")
+title(main="Liver Cancer and Alcohol Data with Fitted Logistic Regression Line")
+```
+
+<h4>7a.</h4>
+Do you see a dose-response relationship between alcohol consumption and liver cancer? 
+
+In this data there appears to be a dose-response relationship between alcohol use and liver cancer. 
+
+<h4>7b.</h4>
+Based on the above analyses, which variable type for alcohol (continuous, dichotomous, or categorical) would you choose?  Why?
+
+In this case I would probably keep the variable categorical. If you dichotomize it you're loosing the dose-response effect. I think it would be hard for people to remember exactly how much alcohol they consume on average a day exactly, but could probably put themselves in an appropriate category. 
+
+
+<h4>Part B</h4>
+Questions for  part B are based on the following article:
+
+Calis JC, Phiri KS, Faragher EB, Brabin BJ, Bates I, Cuevas LE, de Haan RJ, Phiri AI, Malange P, Khoka M, Hulshof PJ, van Lieshout L, Beld MG, Teo YY, Rockett KA, Richardson A, Kwiatkowski DP, Molyneux ME, van Hensbroek MB.  Severe Anemia in Malawian Children. N Engl J Med. 2008 Feb 28;358(9):888-99.
+
+<h4>8.</h4>
+Using data from Table-2, calculate the overall crude OR for the association between vitamin A deficiency and severe anemia for all study sites combined. Compare this with the adjusted estimate in Figure-1. Is there evidence for confounding of this association based on the 10% change in parameter estimate criteria? If so, in what direction?
+
+<h4>9.</h4>
+In figure 1, for exposure ‘vitamin A deficiency’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
+
+For vitamin A, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
+
+Based on your model, which odds ratios would you report that would best describe the association between vitamin A deficiency and severe anemia?
+
+<h4>10.</h4>
+In figure 1, for exposure ‘HIV’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
+
+For HIV, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
+
+Based on your model, which odds ratios would you report that would best describe the association between HIV and severe anemia?
+
+
+
+Basic scatterplot
+```{r}
+head(lab4)
+p1 <- ggplot(data=lab4, aes(x=bmi, y=weight7))
+p1 <- p1 + geom_point()
+p1 <- p1
+p1
+```
+
+```{r}
+
+```
+
+
+
+
