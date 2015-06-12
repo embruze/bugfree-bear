@@ -188,35 +188,37 @@ In figure 1, for exposure ‘vitamin A deficiency’, is there effect modificati
 Urban: (115x37)/(68x6)=10.4289
 Rural: (113x53)/(104x13)=4.4297
 
+
 10.4289/4.4297= 2.3543>1 
 There is evidence of multiplicative interaction. 
 
 For vitamin A, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
 
+In this case it probably makes sense to keep them separate. The ORs are not similar - unordered polytomous logistic regression would be appropriate. 
+
 Based on your model, which odds ratios would you report that would best describe the association between vitamin A deficiency and severe anemia?
+
+I would report the crude ORs and adjusted ORs. 
 
 <h4>10.</h4>
 In figure 1, for exposure ‘HIV’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
 
+Rural community: 0.5
+Rural hospital: 0.3
+Urban community: 3.7
+Urban hospital 2.2
+
+3.7/0.5 = 7.4 > 1 
+2.2/0.3 = 7.3 > 1 
+
+There is evidence of multiplicative interaction. 
+
 For HIV, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
+
+The ORs are not similar so unordered polytomous logistic regression would be appropriate.
 
 Based on your model, which odds ratios would you report that would best describe the association between HIV and severe anemia?
 
-
-
-Basic scatterplot
-```{r}
-head(lab4)
-p1 <- ggplot(data=lab4, aes(x=bmi, y=weight7))
-p1 <- p1 + geom_point()
-p1 <- p1
-p1
-```
-
-```{r}
-
-```
-
-
+Again, I would report the crude and adjusted ORs. 
 
 
