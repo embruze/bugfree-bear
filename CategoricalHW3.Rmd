@@ -1,0 +1,133 @@
+---
+title: "Categorical Data Analysis"
+author: "Emilie Bruzelius (eb2674)"
+output: html_document
+---
+
+<h4>Homework 3 </h4>
+<h4>P8120 Summer 2015 </h4>
+<h4>Due: Monday, June 15 (5:00 pm) </h4>
+
+```{r}
+rm(list=ls())
+library(pwr)
+library(epitools)
+library(epiR)
+```
+
+<h3>1.</h3>
+A case-control study is being planned to study the relationship between alcohol consumption and coronary death (CD).  In particular, investigators are interested in the effects of alcohol consumption within 24 hours of a CD.  The exposure variable is whether or not the subject consumed alcohol within 24 hours of death. Cases are defined as those who suffered CD and controls are those who died of other causes.  Use SAS to complete each part below.
+
+<h3>1.a</h3>
+300 cases and 300 controls will be recruited and their exposure status will be recorded.  It is anticipated that 5% of controls consumed alcohol within 24 hours of death and the OR that investigators would like to be able to detect is 2.0 (OR for CD comparing those who drank alcohol to those who did not).  Assuming that a 2-sided, α = 0.05 level test will be conducted, what power will this test have for detecting a significant association between alcohol consumption within 24 hours and CD?
+
+```{r}
+ES.h(0.09523, 0.05)
+pwr.2p.test(h=0.1764014, n=300, sig.level=0.05)
+```
+
+**The test will have 57.95% power to detect a significant association between alcohol consumption within 24 hours and CD.**
+
+<h3>1.b</h3>
+Investigators still wish to carry out a 2-sided, α = 0.05 level test with the same exposure probability among controls and the same OR.  They also wish to keep the number of cases and controls balanced, but they want their test to achieve 80% power.  How many subjects will they need to recruit?  How does this new sample size compare to the sample size in part (a)?
+
+```{r}
+pwr.2p.test(h=0.1764014, sig.level=0.05, power=.80)
+```
+**N = 504.4668, so 505 participants are required per group. The sample size in part B is larger than the 300 participants noted in part A. As the investigators want 80% power to detect the association they require a larger sample size than is specified in part A - i.e. as the desired power increases, the necessary sample size also increases.** 
+
+<h3>1.c</h3> 
+Investigators realize that it will be more difficult to ascertain cases than controls.  Instead they decide to recruit twice as many controls as cases.  With all else the same as in part (a), how many cases and how many controls will they need to recruit?  How does the total sample size in part (a) compare to your new total sample size?
+
+```{r}
+pwr.2p2n.test(h = 0.1764014, n1 = 300, n2 = 600, sig.level = 0.05)
+```
+**The test will have 70.36% power to detect a significant association between alcohol consumption within 24 hours and CD.**
+
+<h3>1.d</h3>
+Consider part (b) again. What happens to the sample size calculation when the level of the test is decreased?
+
+**Power is a function of the significance level, sample size and hypothesized effect size. So as the alpha decreases the power decreases; as the number of subjects decreases the power also decreases; as the hypothesizes effect size decreases the power also decreases.**
+
+<h3>1.e</h3>
+Consider part (b) again.  What happens to the sample size calculation when the power of the test is decreased? 
+
+**When the power decreases the sample size decreases. I think its easier to think of it in the other direction - as the sample size decreses the power also decreases. As the sample size decreases increases you are subtracting a larger quantity from the statistic so ultimately the fraction is smaller so the probability of z > small number is bigger than z > big number.** 
+
+<h3>1.f</h3>
+Consider part (b) again.  What happens to the sample size calculation when the OR is closer to 1?
+
+**As the OR moves closer to 1 the effect size is decreasing. Therefore the you are subtracting a bigger quantity leaving a smaller number on the right-hand side of the inequality. Therefore the smaller the OR the less likely you are be able to detect it and conversely the larger the OR the more likely you are to detect it.** 
+
+<h3>2.</h3> 
+Dairy cattle are cattle that are bred for their ability to produce large quantities of milk.  Lameness is a condition that can be detrimental to cattle since it can be painful and result in deleterious effects on the animal’s welfare.  It is a condition in which cows have difficulty moving and especially walking.  Investigators are interested in whether milk production in dairy cows is associated with whether or not the cow becomes lame.  They think that the age of the cow (young or old) may confound and/or modify the relationship between milk production and lameness and so they collect information on the age of the cows as well.  The data that cross classifies lame status and milk production status is stratified by age and is provided in the tables below.  Use SAS to complete each part.     
+
+<h3>2.a</h3> 
+Ignoring age, report the estimate for the OR and its corresponding 95% confidence interval.  Interpret both.  
+
+```{r}
+a <- 43+25
+b <- 130+286
+c <- 26+14
+d <- 277+287
+cows <- matrix(c(68, 416, 40, 564), 2, 2, byrow=TRUE)
+epi.2by2(cows)
+```
+**2.30 (1.50, 3.57)**
+
+**Milk producing cows have 2.30 the odds of lameness compared to non-milk producing cows. We are 95% confident that the true odds ratio lies between 1.5312 and 3.4954.**
+
+<h3>2.b</h3> 
+Ignoring age, is milk production associated with lameness?  Justify your response.
+
+**Based on the 95% confidence interval, in these data there appears to be an association between milk production and lameness in dairy cows.**
+
+<h3>2.c</h3> 
+Does age modify the association between milk production and lameness?  Justify your response with a formal test.
+
+```{r}
+cowsyoung <- matrix(c(43, 130, 26, 277), 2, 2, byrow=TRUE)
+cowsold <- matrix(c(25, 286, 14, 287), 2, 2, byrow=TRUE)
+young <- epi.2by2(cowsyoung, "cohort.count",
+conf.level = 0.95, units = 100,  homogeneity = "breslow.day")
+old <- epi.2by2(cowsold, "cohort.count",
+conf.level = 0.95, units = 100,  homogeneity = "breslow.day")
+
+```
+
+**ORyoung = odds ratio for lameness comparing those with high yeild to those with low yeild among young cows.**
+
+**ORold = odds ratio for lameness comparing those with high yeild to those with low yeild among old cows.**
+
+* **H0: ORyoung = ORold**
+* **H1: ORyoung ≠ ORold**
+* **Set α = 0.05**
+* **Under H0, X^2 BD ~ X^2 1**
+* **From the output: X^2 BD = ?????**
+* **P-value < 0.0001**
+* **So we can reject H0 and claim that at a 5% level of significance there is enough evidence to reject the null hypothesis and conclude that age status modifies the relationship between milk production and lameness.**
+
+<h3>2.d</h3> 
+Based on your response in part (c), does it make sense to report the Mantel-Haenszel estimate of the OR?  Explain why or why not?
+
+**After adjusting for age, cows who had a high milk production yeild have the same odds of lameness as those who had a low yeild.**
+
+<h3>2.e</h3> 
+Does age confound the association between milk production and lameness?  Justify your response by using the appropriate measures and making the appropriate comparisons.  (Regardless of whether it is true or not, assume that age satisfies all conditions for being a potential confounder…you don’t need to check for this exercise.)
+
+**The crude is ??? and the Mantel-Haenszel is ???. Because the crude and the adjusted are so different, there is evidence that age confounds the association between milk production and lameness.**
+
+<h3>2.f</h3> 
+Write a short paragraph summarizing your findings in parts (a) – (e).  Be sure to address the research interests.
+
+**The initial crude analysis found a relationship between milk production yeild and lameness — those who high yeild had 3.9304 times the odds of lameness compared with those with low yeild.  We then proceeded to stratify the analysis by age and examine the association between milk produciton and lameness.  The odds ratios from each stratum were the same and the Breslow-Day test was not significant, and therefore did not give us any evidence of effect measure 
+modification; the relationship between milk production and lameness did not differ by age. We calculated the odds ratio for the relationship between milk production and lameness  adjusting for age, the Mantel-Haenszel OR, and found it to be equal to 1.  The results from our adjusted hypothesis test did not yield enough evidence to reject the null and  conclude that the Mantel-Haenszel OR was different from 1, and our 95% confidence interval for the Mantel-Haenszel OR contained 1.  We have evidence that age confounded the relationship between milk production and lameness, and after adjusting for age; there is no evidence that milk production and lameness are related.**
+
+<h3>4.</h3> 
+A new vaccine has been developed and investigators are interested in whether it has any effect on the rate of infection for a particular disease.  A randomized controlled trial was conducted to compare the new vaccine to placebo with respect to rate of infection.  You are the lead statistician for this trial and are given the task of analyzing the data and reporting back to the investigators.  Use SAS to complete each part.  The data is given in the table below:
+
+```{r}
+vac <- matrix(c(191, 98, 3139, 1581), 2, 2, byrow=TRUE)
+epi.2by2(vac)
+```
+
