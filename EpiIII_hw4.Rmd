@@ -151,7 +151,7 @@ Do you see a dose-response relationship between alcohol consumption and liver ca
 <h4>7b.</h4>
 Based on the above analyses, which variable type for alcohol (continuous, dichotomous, or categorical) would you choose?  Why?
 
-**In this case I would probably keep the variable categorical. If you dichotomize it you're loosing the dose-response effect. I think it would be hard for people to remember exactly how much alcohol they consume on average a day exactly, but could probably put themselves in an appropriate category.** 
+**In this case I would probably keep the variable categorical. If you dichotomize the variable you're loosing the dose-response effect. It might be hard for people to remember how much alcohol they consume on average a day exactly, but could probably put themselves in an appropriate category.** 
 
 
 <h4>Part B</h4>
@@ -186,7 +186,7 @@ For vitamin A, is there evidence to suggest that the two control groups (communi
 
 Based on your model, which odds ratios would you report that would best describe the association between vitamin A deficiency and severe anemia?
 
-**I would report the crude ORs and adjusted ORs.** 
+**I would report the crude OR and the specific ORs for the community and hospital groups.** 
 
 <h4>10.</h4>
 In figure 1, for exposure ‘HIV’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
