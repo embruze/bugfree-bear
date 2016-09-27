@@ -1,0 +1,231 @@
+---
+title: "EpiIII-Homework-4"
+author: "Emilie Bruzelius (eb2674)"
+date: "June 9, 2015"
+output: html_document
+---
+P8400 APPLIED DATA ANALYSIS IN EPIDEMIOLOGY 
+HOMEWORK 4
+ANSWER KEY
+
+  
+INSTRUCTIONS:
+1. Please keep your answers brief (1-2 sentences).
+2. Please provide relevant SAS codes for your answers.
+
+
+PART A
+
+Dataset to be used: LiverCa.sas7bdat
+
+For part A, the objective is to analyze which variable forms (continuous, dichotomous, or categorical) of age and alcohol use best describe the measures’ relationships with liver cancer in the following case-control study:  
+
+Data dictionary for LiverCa dataset
+Variable Name 	Description
+CaseCont
+ 	1=Case (liver cancer)
+	0=Control
+Age	Age in years (range = 21-91 years)
+EtOH
+ 	Daily alcohol consumption:
+	0=0-9 grams/day
+1=10-19 grams/day
+2=20-29 grams/day
+3=30-39 grams/day
+4=40+ grams/day
+
+1. Set up a logistic regression model to examine the effects of the following indicator (dummy) variables of age using ‘21-30’ as the reference group.  Report the parameter estimates.  
+
+     
+
+data hw4;
+set epi3.liverca;
+  age1=0;
+  age2=0;
+  age3=0;
+  age4=0;
+  age5=0;
+  if 31 <= age <= 40 then age1=1;
+  if 41 <= age <= 50 then age2=1;
+  if 51 <= age <= 60 then age3=1;
+  if 61 <= age <= 70 then age4=1;
+  if age >= 71 then age5=1;
+if age=. then do;
+age1=.;
+age2=.;
+age3=.;
+age4=.;
+age5=.;
+end;
+run;
+
+proc logistic data=hw4 descending;
+  model casecont = age1 age2 age3 age4 age5;
+run;
+
+
+
+2a. Plot a graph showing the relationship between the log odds of disease and the six categories of age.  Show your graph.
+
+
+data plot1;
+input beta age;
+cards;
+
+0.0000 0
+0.1157 1
+0.1790 2
+2.3480 3
+2.4390 4
+2.7111 5
+;
+run;
+ 
+proc gplot data=plot1;
+plot beta*age;
+symbol line=1 width=5 interpol=join;
+run;
+quit;
+
+
+2b. Based on the above analyses, which variable type for age (continuous, dichotomous or categorical) will you choose?  Why?
+
+
+
+
+Regardless of what you decided about the variable type for age, let’s examine the effect of the continuous measurement of age (i.e., ‘age’) on liver cancer using logistic regression.
+
+3. Report the parameter estimate (b), OR and 95% CI for the crude association between ‘age’ and liver cancer. Interpret the results.
+
+proc logistic data = hw4 descending;
+model casecont = age; 
+run;
+
+
+
+
+4a. Estimate the odds of getting liver cancer for a man aged 65 years with a man who is similar in other respects but aged 45 years.
+
+
+
+4b. For the above question, what is the assumption if we choose to keep age as a continuous variable?
+
+
+
+
+
+We will now examine the association between alcohol consumption and liver cancer.  
+
+5. Create indicator variables for the five categories of alcohol use. Use logistic regression to model the effects of indicator variables of alcohol using non-users as the reference group. Report the parameter estimates. 
+                        
+data hw4;
+  set hw4;
+  etoh1=0;
+  etoh2=0;
+  etoh3=0;
+  etoh4=0;
+  if etoh = 1 then etoh1=1;
+  if etoh = 2 then etoh2=1;
+  if etoh = 3 then etoh3=1;
+  if etoh = 4 then etoh4=1;
+  if etoh=. then do;
+  etoh1=.;
+  etoh2=.;
+  etoh3=.;
+  etoh4=.;
+  end;
+  run;
+
+proc logistic data=hw4 descending;
+model casecont = etoh1 etoh2 etoh3 etoh4;
+run;
+
+
+
+
+
+
+
+6. Plot a graph showing the relationship between the log odds of disease (betas) and the five categories of alcohol use. Show your graph.
+
+data plot2;
+input beta etoh;
+cards;
+
+0.0000 0
+0.4479 1
+0.6246 2
+1.0433 3
+1.4173 4
+;
+run;
+
+proc gplot data=plot2;
+plot beta*etoh;
+symbol line=1 width=5 interpol=join;
+run;
+quit;
+
+
+
+
+7a. Do you see a dose-response relationship between alcohol consumption and liver cancer? 
+
+
+
+
+
+7b. Based on the above analyses, which variable type for alcohol (continuous, dichotomous, or categorical) would you choose?  Why?
+
+
+
+
+
+
+
+PART B 
+Questions for  part B are based on the following article:
+
+Calis JC, Phiri KS, Faragher EB, Brabin BJ, Bates I, Cuevas LE, de Haan RJ, Phiri AI, Malange P, Khoka M, Hulshof PJ, van Lieshout L, Beld MG, Teo YY, Rockett KA, Richardson A, Kwiatkowski DP, Molyneux ME, van Hensbroek MB.  Severe Anemia in Malawian Children. N Engl J Med. 2008 Feb 28;358(9):888-99.
+
+8. Using data from Table-2, calculate the overall crude OR for the association between vitamin A deficiency and severe anemia for all study sites combined. Compare this with the adjusted estimate in Figure-1. Is there evidence for confounding of this association based on the 10% change in parameter estimate criteria? If so, in what direction?
+
+
+9. In figure 1, for exposure ‘vitamin A deficiency’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
+
+For vitamin A, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
+
+Based on your model, which odds ratios would you report that would best describe the association between vitamin A deficiency and severe anemia?
+
+
+10. In figure 1, for exposure ‘HIV’, is there effect modification of the association by the variable for study site (rural/urban)? On what scale are the authors assessing this interaction? 
+
+For HIV, is there evidence to suggest that the two control groups (community/hospital) should be combined for a binary logistic regression or should they be kept separate (as either 2 separate binary logistic regression models or one unordered polytomous model)?
+
+Based on your model, which odds ratios would you report that would best describe the association between HIV and severe anemia?
+
+
+
+
+```{r}
+library(foreign)
+library(sas7bdat)
+library(ggplot2)
+lab4 <- read.sas7bdat("adult_bmi.sas7bdat", debug=FALSE)
+```
+
+Basic scatterplot
+```{r}
+head(lab4)
+p1 <- ggplot(data=lab4, aes(x=bmi, y=weight7))
+p1 <- p1 + geom_point()
+p1 <- p1
+p1
+```
+
+```{r}
+
+```
+
+
+
